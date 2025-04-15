@@ -1,4 +1,3 @@
-const { get } = require('../routes/usuarioRoutes');
 const clienteService = require ('../services/clienteService');
 
 /*Após executar a query SQL por meio do script clienteService.js, os dados serão retornados, isto é, os dados dos clientes que estejam cadastrados no banco de dados.

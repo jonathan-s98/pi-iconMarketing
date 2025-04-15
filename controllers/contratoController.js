@@ -1,4 +1,3 @@
-const { get } = require('../routes/usuarioRoutes');
 const contratoService = require('../services/contratoService');
 
 async function cadastrarNovoContrato(req, res) {
