@@ -1,5 +1,20 @@
 const { sql, config } = require('../config/db');
 
+//Função para cadastrar um novo cliente no banco de dados
+async function cadastrarCliente(nome_fantasia, razao_social, cnpj, segmento, telefone, site, id_usuario) {
+    const pool = await sql.connect(config);
+    const resultado = await pool.request()
+        .input('nome_fantasia', sql.VarChar, nome_fantasia)
+        .input('razao_social', sql.VarChar, razao_social)
+        .input('cnpj', sql.VarChar, cnpj)
+        .input('segmento', sql.VarChar, segmento)
+        .input('telefone', sql.VarChar, telefone)
+        .input('site', sql.VarChar, site)
+        .input('id_usuario', sql.Int, id_usuario)
+        .query(`INSERT INTO Cliente (nome_fantasia, razao_social, cnpj, segmento, telefone, site, id_usuario) VALUES (@nome_fantasia, @razao_social, @cnpj, @segmento, @telefone, @site, @id_usuario)`);
+    return resultado.rowsAffected[0] > 0;
+}
+
 //Função para pesquisar clientes no banco de dados
 async function pesquisarCliente() {
     const requisicaoAcessoDB = await sql.connect(config);
@@ -25,4 +40,33 @@ async function qtdeContratos() {
     return resultado.recordset;
 }
 
-module.exports = {pesquisarCliente, statusContrato, qtdeContratos};
+//Função para atualizar um cliente no banco de dados
+async function atualizarCliente(id, nome_fantasia, razao_social, cnpj, segmento, telefone, site) {
+    try {
+        const requisicaoAcessoDB = await sql.connect(config);
+        const resultado = await requisicaoAcessoDB.request()
+            .input('id', sql.Int, id)
+            .input('nome_fantasia', sql.VarChar, nome_fantasia)
+            .input('razao_social', sql.VarChar, razao_social)
+            .input('cnpj', sql.VarChar, cnpj)
+            .input('segmento', sql.VarChar , segmento)
+            .input('telefone', sql.VarChar , telefone)
+            .input('site', sql.VarChar , site)
+            .query('UPDATE Cliente SET nome_fantasia = @nome_fantasia, razao_social = @razao_social, cnpj = @cnpj, segmento = @segmento, telefone = @telefone, site = @site WHERE id = @id');
+
+        return resultado.rowsAffected[0];
+    } catch (erro) {
+        throw erro;
+    }
+}
+
+async function pesquisarClientePorCNPJ(CNPJ) {
+    const requisicaoAcessoDB = await sql.connect(config);
+    const resultado = await requisicaoAcessoDB.request()
+        .input('CNPJ', sql.VarChar, CNPJ)
+        .query(`SELECT * FROM Cliente WHERE CNPJ = @CNPJ`);
+        
+    return resultado.recordset[0];
+}
+
+module.exports = {cadastrarCliente, pesquisarCliente, statusContrato, qtdeContratos, atualizarCliente, pesquisarClientePorCNPJ};
